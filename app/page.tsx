@@ -122,5 +122,33 @@ export default function Main(){
     },
   ]);
   
+  const randomEvents: RandomEvent[] = [
+    {
+      message: "🌧️ It's raining - Router is sad",
+      speedMultiplier: 0.5,
+      duration: 10,
+    },
+    {
+      message: "📺 Neighbor started streaming 4K Netflix",
+      speedMultiplier: 0.3,
+      duration: 15,
+    },
+    {
+      message: "🌙 It's 3 AM - Everyone is asleep!",
+      speedMultiplier: 3,
+      duration: 20,
+    },
+    {
+      message: "☀️ Perfect weather - Router happy",
+      speedMultiplier: 2,
+      duration: 12,
+    },
+    {
+      message: "🎮 Someone downloaded Warzone",
+      speedMultiplier: 0.1,
+      duration: 8,
+    },
+  ];
+
   return <></>
 }
