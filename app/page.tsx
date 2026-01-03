@@ -1,154 +1,168 @@
-'use client'
+"use client";
 
-import {useEffect ,useState, useCallback } from 'react' ;
+import { useEffect, useState, useMemo, useRef, startTransition } from "react";
 
 interface Upgrade {
-  id:string;
-  name:string;
-  description:string;
-  cost:number;
-  speedBoost:number;
-  owned:number;
-  costMultiplier:number;
-  emoji:string;
+  id: string;
+  name: string;
+  description: string;
+  cost: number;
+  speedBoost: number;
+  owned: number;
+  costMultiplier: number;
+  icon: string;
 }
 
 interface RandomEvent {
-  message:string;
-  speedMultiplier:number;
-  duration:number;
+  message: string;
+  speedMultiplier: number;
+  duration: number;
 }
 
-export default function Main(){
+const initialUpgrades: Upgrade[] = [
+  {
+    id: "blow",
+    name: "Blow on Router",
+    description: "Classic tech support",
+    cost: 5,
+    speedBoost: 50,
+    owned: 0,
+    costMultiplier: 1.15,
+    icon: "💨",
+  },
+  {
+    id: "restart",
+    name: "Restart Router",
+    description: "Turn it off and on again",
+    cost: 25,
+    speedBoost: 200,
+    owned: 0,
+    costMultiplier: 1.2,
+    icon: "🔄",
+  },
+  {
+    id: "move",
+    name: "Move Router 2cm Left",
+    description: "Science-backed technique",
+    cost: 100,
+    speedBoost: 1000,
+    owned: 0,
+    costMultiplier: 1.25,
+    icon: "⬅️",
+  },
+  {
+    id: "disconnect",
+    name: "Disconnect Other Devices",
+    description: "Kick everyone off",
+    cost: 500,
+    speedBoost: 5000,
+    owned: 0,
+    costMultiplier: 1.3,
+    icon: "📵",
+  },
+  {
+    id: "call",
+    name: "Call ISP Support",
+    description: "Wait time: 45 minutes",
+    cost: 2500,
+    speedBoost: 25000,
+    owned: 0,
+    costMultiplier: 1.35,
+    icon: "☎️",
+  },
+  {
+    id: "threaten",
+    name: "Threaten to Switch",
+    description: "They'll take you seriously",
+    cost: 12500,
+    speedBoost: 125000,
+    owned: 0,
+    costMultiplier: 1.4,
+    icon: "😤",
+  },
+  {
+    id: "karen",
+    name: "Scream at Customer Service",
+    description: "KAREN MODE ACTIVATED",
+    cost: 50000,
+    speedBoost: 500000,
+    owned: 0,
+    costMultiplier: 1.5,
+    icon: "🗣️",
+  },
+  {
+    id: "fiber",
+    name: "Upgrade to Fiber",
+    description: "Actually good internet",
+    cost: 250000,
+    speedBoost: 2500000,
+    owned: 0,
+    costMultiplier: 1.6,
+    icon: "🌐",
+  },
+  {
+    id: "isp",
+    name: "Become the ISP",
+    description: "If you can't beat them...",
+    cost: 1000000,
+    speedBoost: 10000000,
+    owned: 0,
+    costMultiplier: 2,
+    icon: "🏢",
+  },
+];
+
+const loadSavedData = () => {
+  if (typeof window === "undefined") return null;
+  const saved = localStorage.getItem("internetSpeedGame");
+  return saved ? JSON.parse(saved) : null;
+};
+
+const TARGET_BYTES = 100 * 1024 * 1024 * 1024;
+
+export default function InternetSpeedSimulator() {
+  const lastClickTime = useRef(0);
+  const CLICK_COOLDOWN = 100;
+  const [isMounted, setIsMounted] = useState(false);
+  const hasLoadedData = useRef(false);
 
   const [money, setMoney] = useState(0);
   const [clickValue, setClickValue] = useState(1);
-  const [bytesPerSecond, setBytesPerSecond] = useState(1);
+  const [bytesPerSecond, setBytesPerSecond] = useState(100);
   const [totalBytes, setTotalBytes] = useState(0);
+  const [upgrades, setUpgrades] = useState<Upgrade[]>(initialUpgrades);
   const [activeEvent, setActiveEvent] = useState<RandomEvent | null>(null);
   const [eventTimeLeft, setEventTimeLeft] = useState(0);
   const [isGameWon, setIsGameWon] = useState(false);
 
-  const [upgrades,setUpgrades] = useState<Upgrade[]>([
-    {
-      id: "blow",
-      name: "Blow on Router",
-      description: "Classic tech support",
-      cost: 10,
-      speedBoost: 5,
-      owned: 0,
-      costMultiplier: 1.15,
-      emoji: "💨",
-    },
-    {
-      id: "restart",
-      name: "Restart Router",
-      description: "Turn it off and on again",
-      cost: 50,
-      speedBoost: 20,
-      owned: 0,
-      costMultiplier: 1.2,
-      emoji: "🔄",
-    },
-    {
-      id: "move",
-      name: "Move Router 2cm Left",
-      description: "Science-backed technique",
-      cost: 200,
-      speedBoost: 50,
-      owned: 0,
-      costMultiplier: 1.25,
-      emoji: "⬅️",
-    },
-    {
-      id: "disconnect",
-      name: "Disconnect Other Devices",
-      description: "Kick everyone off",
-      cost: 1000,
-      speedBoost: 100,
-      owned: 0,
-      costMultiplier: 1.3,
-      emoji: "📵",
-    },
-    {
-      id: "call",
-      name: "Call ISP Support",
-      description: "Wait time: 45 minutes",
-      cost: 5000,
-      speedBoost: 500,
-      owned: 0,
-      costMultiplier: 1.35,
-      emoji: "☎️",
-    },
-    {
-      id: "threaten",
-      name: "Threaten to Switch",
-      description: "They'll take you seriously",
-      cost: 25000,
-      speedBoost: 2000,
-      owned: 0,
-      costMultiplier: 1.4,
-      emoji: "😤",
-    },
-    {
-      id: "karen",
-      name: "Scream at Customer Service",
-      description: "KAREN MODE ACTIVATED",
-      cost: 100000,
-      speedBoost: 10000,
-      owned: 0,
-      costMultiplier: 1.5,
-      emoji: "🗣️",
-    },
-    {
-      id: "fiber",
-      name: "Upgrade to Fiber",
-      description: "Actually good internet",
-      cost: 500000,
-      speedBoost: 50000,
-      owned: 0,
-      costMultiplier: 1.6,
-      emoji: "🌐",
-    },
-    {
-      id: "isp",
-      name: "Become the ISP",
-      description: "If you can't beat them...",
-      cost: 5000000,
-      speedBoost: 500000,
-      owned: 0,
-      costMultiplier: 2,
-      emoji: "🏢",
-    },
-  ]);
-  
-  const randomEvents: RandomEvent[] = [
-    {
-      message: "🌧️ It's raining - Router is sad",
-      speedMultiplier: 0.5,
-      duration: 10,
-    },
-    {
-      message: "📺 Neighbor started streaming 4K Netflix",
-      speedMultiplier: 0.3,
-      duration: 15,
-    },
-    {
-      message: "🌙 It's 3 AM - Everyone is asleep!",
-      speedMultiplier: 3,
-      duration: 20,
-    },
-    {
-      message: "☀️ Perfect weather - Router happy",
-      speedMultiplier: 2,
-      duration: 12,
-    },
-    {
-      message: "🎮 Someone downloaded Warzone",
-      speedMultiplier: 0.1,
-      duration: 8,
-    },
-  ];
-
-  return <></>
+  const randomEvents: RandomEvent[] = useMemo(
+    () => [
+      {
+        message: "It's raining - Connection unstable",
+        speedMultiplier: 0.5,
+        duration: 10,
+      },
+      {
+        message: "Neighbor streaming 4K - Bandwidth reduced",
+        speedMultiplier: 0.3,
+        duration: 15,
+      },
+      {
+        message: "3 AM - Network congestion minimal",
+        speedMultiplier: 3,
+        duration: 20,
+      },
+      {
+        message: "Perfect conditions - Speed boost",
+        speedMultiplier: 2,
+        duration: 12,
+      },
+      {
+        message: "Heavy download detected - Throttling active",
+        speedMultiplier: 0.1,
+        duration: 8,
+      },
+    ],
+    []
+  );
 }
