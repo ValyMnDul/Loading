@@ -195,6 +195,25 @@ export default function InternetSpeedSimulator() {
     localStorage.setItem("internetSpeedGame", JSON.stringify(saveData));
   }, [money, clickValue, bytesPerSecond, totalBytes, upgrades, isMounted]);
 
-  
+  useEffect(() => {
+    if (!isMounted) return;
+    const interval = setInterval(() => {
+      const effectiveSpeed = activeEvent
+        ? bytesPerSecond * activeEvent.speedMultiplier
+        : bytesPerSecond;
+
+      setTotalBytes((prev: number) => {
+        const newTotal = prev + effectiveSpeed;
+        if (newTotal >= TARGET_BYTES && !isGameWon) {
+          setIsGameWon(true);
+        }
+        return newTotal;
+      });
+      
+      setMoney((prev: number) => prev + effectiveSpeed / 1000);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [bytesPerSecond, activeEvent, isGameWon, isMounted]);
 
 }
