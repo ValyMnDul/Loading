@@ -216,6 +216,20 @@ export default function InternetSpeedSimulator() {
     return () => clearInterval(interval);
   }, [bytesPerSecond, activeEvent, isGameWon, isMounted]);
 
+  useEffect(() => {
+    if (!isMounted) return;
+    const eventInterval = setInterval(() => {
+      if (Math.random() < 0.1 && !activeEvent) {
+        const event =
+          randomEvents[Math.floor(Math.random() * randomEvents.length)];
+        setActiveEvent(event);
+        setEventTimeLeft(event.duration);
+      }
+    }, 5000);
+
+    return () => clearInterval(eventInterval);
+  }, [activeEvent, randomEvents, isMounted]);
+
   return (
     <div
     className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-black text-white p-6"
