@@ -165,4 +165,36 @@ export default function InternetSpeedSimulator() {
     ],
     []
   );
+
+  useEffect(() => {
+    if (hasLoadedData.current) return;
+    hasLoadedData.current = true;
+    
+    const data = loadSavedData();
+    startTransition(() => {
+      if (data) {
+        setMoney(data.money || 0);
+        setClickValue(data.clickValue || 1);
+        setBytesPerSecond(data.bytesPerSecond || 100);
+        setTotalBytes(data.totalBytes || 0);
+        setUpgrades(data.upgrades || initialUpgrades);
+      }
+      setIsMounted(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+    const saveData = {
+      money,
+      clickValue,
+      bytesPerSecond,
+      totalBytes,
+      upgrades,
+    };
+    localStorage.setItem("internetSpeedGame", JSON.stringify(saveData));
+  }, [money, clickValue, bytesPerSecond, totalBytes, upgrades, isMounted]);
+
+  
+
 }
