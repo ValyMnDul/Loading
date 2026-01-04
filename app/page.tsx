@@ -216,4 +216,28 @@ export default function InternetSpeedSimulator() {
     return () => clearInterval(interval);
   }, [bytesPerSecond, activeEvent, isGameWon, isMounted]);
 
+  return (
+    <div
+    className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-black text-white p-6"
+    >
+      <div
+      className="max-w-7xl mx-auto pt-5"
+      >
+        <div
+        className="mb-10 mt-4"
+        >
+          <h1
+          className="text-4xl font-bold text-white mb-2"
+          >
+            Loading
+          </h1>
+          <p
+          className="text-gray-400 text-lg"
+          >
+            Download 100 GB as fast as you can
+          </p>
+        </div>
+      </div>
+    </div>
+  )
 }
