@@ -1,4 +1,4 @@
-
+![Icon](app/favicon.ico)
 
 ## Getting Started
 
