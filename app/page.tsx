@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState, useMemo, useRef, startTransition } from "react";
 
 interface Upgrade {
@@ -8,7 +7,7 @@ interface Upgrade {
   description: string;
   cost: number;
   speedBoost: number;
-  owned: number;
+  owned: number; 
   costMultiplier: number;
   icon: string;
 }
@@ -120,19 +119,30 @@ const loadSavedData = () => {
 
 const TARGET_BYTES = 100 * 1024 * 1024 * 1024;
 
-export default function InternetSpeedSimulator() {
+export default function Loading() {
+  
   const lastClickTime = useRef(0);
+
   const CLICK_COOLDOWN = 100;
+
   const [isMounted, setIsMounted] = useState(false);
+
   const hasLoadedData = useRef(false);
 
   const [money, setMoney] = useState(0);
+
   const [clickValue, setClickValue] = useState(1);
+
   const [bytesPerSecond, setBytesPerSecond] = useState(100);
+
   const [totalBytes, setTotalBytes] = useState(0);
+
   const [upgrades, setUpgrades] = useState<Upgrade[]>(initialUpgrades);
+
   const [activeEvent, setActiveEvent] = useState<RandomEvent | null>(null);
+
   const [eventTimeLeft, setEventTimeLeft] = useState(0);
+
   const [isGameWon, setIsGameWon] = useState(false);
 
   const randomEvents: RandomEvent[] = useMemo(
@@ -229,6 +239,58 @@ export default function InternetSpeedSimulator() {
 
     return () => clearInterval(eventInterval);
   }, [activeEvent, randomEvents, isMounted]);
+
+  useEffect(() => {
+    if (!activeEvent || eventTimeLeft <= 0) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setEventTimeLeft((prev: number) => {
+        const newTime = prev - 1;
+        if (newTime <= 0) {
+          setActiveEvent(null);
+        }
+        return newTime;
+      });
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [eventTimeLeft, activeEvent]);
+
+  const handleClick = () => {
+    const now = Date.now();
+    if (now - lastClickTime.current < CLICK_COOLDOWN) {
+      return;
+    }
+    lastClickTime.current = now;
+
+    setMoney((prev: number) => prev + clickValue);
+  };
+
+  const buyUpgrade = (upgrade:Upgrade) => {
+    if(money >= upgrade.cost){
+
+      setMoney((prev:number)=>prev - upgrade.cost);
+      setBytesPerSecond((prev:number)=>prev + upgrade.speedBoost);
+
+      setUpgrades((prev:Upgrade[])=>
+        prev.map((u)=>u.id === upgrade.id
+        ? {
+          ...u,
+          owned:u.owned + 1,
+          cost:Math.floor(u.cost * u.costMultiplier)
+        }
+        : u
+      ))
+      setClickValue((prev:number)=> prev + Math.floor(upgrade.speedBoost / 100));
+    }
+  }
+
+  const formatBytes = (bytes:number):string=>{
+    if (bytes < 1024) return `${bytes.toFixed(0)} B`;
+    if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(2)} KB`;
+  }
 
   return (
     <div
