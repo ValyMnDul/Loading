@@ -179,7 +179,6 @@ export default function Loading() {
   useEffect(() => {
     if (hasLoadedData.current) return;
     hasLoadedData.current = true;
-    
     const data = loadSavedData();
     startTransition(() => {
       if (data) {
@@ -192,7 +191,6 @@ export default function Loading() {
       setIsMounted(true);
     });
   }, []);
-
   useEffect(() => {
     if (!isMounted) return;
     const saveData = {
@@ -211,15 +209,13 @@ export default function Loading() {
       const effectiveSpeed = activeEvent
         ? bytesPerSecond * activeEvent.speedMultiplier
         : bytesPerSecond;
-
       setTotalBytes((prev: number) => {
         const newTotal = prev + effectiveSpeed;
         if (newTotal >= TARGET_BYTES && !isGameWon) {
           setIsGameWon(true);
         }
         return newTotal;
-      });
-      
+      });    
       setMoney((prev: number) => prev + effectiveSpeed / 1000);
     }, 1000);
 
@@ -235,10 +231,10 @@ export default function Loading() {
         setActiveEvent(event);
         setEventTimeLeft(event.duration);
       }
-    }, 5000);
+    }, 5000); 
 
     return () => clearInterval(eventInterval);
-  }, [activeEvent, randomEvents, isMounted]);
+  }, [activeEvent, randomEvents, isMounted]); 
 
   useEffect(() => {
     if (!activeEvent || eventTimeLeft <= 0) {
@@ -288,8 +284,17 @@ export default function Loading() {
   }
 
   const formatBytes = (bytes:number):string=>{
-    if (bytes < 1024) return `${bytes.toFixed(0)} B`;
-    if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(2)} KB`;
+    if(bytes < 1024) return `${bytes.toFixed(0)} B`;
+    if(bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(2)} KB`;
+    if(bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(2)} MB`;
+    return `${(bytes / 1024 ** 3).toFixed(2)} GB`;
+  }
+
+  const formatSpeed =(bytesPerSec: number): string =>{
+    if(bytesPerSec < 1024) return `${bytesPerSec.toFixed(0)} B/s`;
+    if(bytesPerSec < 1024 ** 2) return `${(bytesPerSec / 1024).toFixed(2)} KB/s`;
+    if(bytesPerSec < 1024 ** 3) return `${(bytesPerSec / 1024 ** 2).toFixed(2)} MB/s`;
+    return `${(bytesPerSec / 1024 ** 3).toFixed(2)} GB/s`;
   }
 
   return (
