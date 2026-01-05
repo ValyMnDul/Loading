@@ -296,6 +296,31 @@ export default function Loading() {
     if(bytesPerSec < 1024 ** 3) return `${(bytesPerSec / 1024 ** 2).toFixed(2)} MB/s`;
     return `${(bytesPerSec / 1024 ** 3).toFixed(2)} GB/s`;
   }
+  
+  const formatMoney = (amount:number):string => {
+    return `$${amount.toFixed(2)}`
+  }
+
+  const formatTime = (seconds:number) :string => {
+    if(seconds < 60) return `${Math.floor(seconds)}s`;
+    if(seconds < 3600) return `${Math.floor(seconds / 60)}m ${Math.floor(seconds % 60)}s`;
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}h ${minutes}m`;
+  }
+  const resetGame = () =>{
+    if(confirm('Reset game? All progress will be lost!')){
+      localStorage.removeItem("internetSpeedGame");
+      setMoney(0);
+      setClickValue(1);
+      setBytesPerSecond(100);
+      setTotalBytes(0);
+      setUpgrades(initialUpgrades);
+      setIsGameWon(false);
+      setActiveEvent(null);
+      setEventTimeLeft(0);
+    }
+  }
 
   return (
     <div
