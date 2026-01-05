@@ -7,7 +7,7 @@ interface Upgrade {
   description: string;
   cost: number;
   speedBoost: number;
-  owned: number; 
+  owned: number;
   costMultiplier: number;
   icon: string;
 }
@@ -120,7 +120,6 @@ const loadSavedData = () => {
 const TARGET_BYTES = 100 * 1024 * 1024 * 1024;
 
 export default function Loading() {
-  
   const lastClickTime = useRef(0);
 
   const CLICK_COOLDOWN = 100;
@@ -215,7 +214,7 @@ export default function Loading() {
           setIsGameWon(true);
         }
         return newTotal;
-      });    
+      });
       setMoney((prev: number) => prev + effectiveSpeed / 1000);
     }, 1000);
 
@@ -231,10 +230,10 @@ export default function Loading() {
         setActiveEvent(event);
         setEventTimeLeft(event.duration);
       }
-    }, 5000); 
+    }, 5000);
 
     return () => clearInterval(eventInterval);
-  }, [activeEvent, randomEvents, isMounted]); 
+  }, [activeEvent, randomEvents, isMounted]);
 
   useEffect(() => {
     if (!activeEvent || eventTimeLeft <= 0) {
@@ -264,52 +263,58 @@ export default function Loading() {
     setMoney((prev: number) => prev + clickValue);
   };
 
-  const buyUpgrade = (upgrade:Upgrade) => {
-    if(money >= upgrade.cost){
+  const buyUpgrade = (upgrade: Upgrade) => {
+    if (money >= upgrade.cost) {
+      setMoney((prev: number) => prev - upgrade.cost);
+      setBytesPerSecond((prev: number) => prev + upgrade.speedBoost);
 
-      setMoney((prev:number)=>prev - upgrade.cost);
-      setBytesPerSecond((prev:number)=>prev + upgrade.speedBoost);
-
-      setUpgrades((prev:Upgrade[])=>
-        prev.map((u)=>u.id === upgrade.id
-        ? {
-          ...u,
-          owned:u.owned + 1,
-          cost:Math.floor(u.cost * u.costMultiplier)
-        }
-        : u
-      ))
-      setClickValue((prev:number)=> prev + Math.floor(upgrade.speedBoost / 100));
+      setUpgrades((prev: Upgrade[]) =>
+        prev.map((u) =>
+          u.id === upgrade.id
+            ? {
+                ...u,
+                owned: u.owned + 1,
+                cost: Math.floor(u.cost * u.costMultiplier),
+              }
+            : u
+        )
+      );
+      setClickValue(
+        (prev: number) => prev + Math.floor(upgrade.speedBoost / 100)
+      );
     }
-  }
+  };
 
-  const formatBytes = (bytes:number):string=>{
-    if(bytes < 1024) return `${bytes.toFixed(0)} B`;
-    if(bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(2)} KB`;
-    if(bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(2)} MB`;
+  const formatBytes = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes.toFixed(0)} B`;
+    if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(2)} KB`;
+    if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(2)} MB`;
     return `${(bytes / 1024 ** 3).toFixed(2)} GB`;
-  }
+  };
 
-  const formatSpeed =(bytesPerSec: number): string =>{
-    if(bytesPerSec < 1024) return `${bytesPerSec.toFixed(0)} B/s`;
-    if(bytesPerSec < 1024 ** 2) return `${(bytesPerSec / 1024).toFixed(2)} KB/s`;
-    if(bytesPerSec < 1024 ** 3) return `${(bytesPerSec / 1024 ** 2).toFixed(2)} MB/s`;
+  const formatSpeed = (bytesPerSec: number): string => {
+    if (bytesPerSec < 1024) return `${bytesPerSec.toFixed(0)} B/s`;
+    if (bytesPerSec < 1024 ** 2)
+      return `${(bytesPerSec / 1024).toFixed(2)} KB/s`;
+    if (bytesPerSec < 1024 ** 3)
+      return `${(bytesPerSec / 1024 ** 2).toFixed(2)} MB/s`;
     return `${(bytesPerSec / 1024 ** 3).toFixed(2)} GB/s`;
-  }
-  
-  const formatMoney = (amount:number):string => {
-    return `$${amount.toFixed(2)}`
-  }
+  };
 
-  const formatTime = (seconds:number) :string => {
-    if(seconds < 60) return `${Math.floor(seconds)}s`;
-    if(seconds < 3600) return `${Math.floor(seconds / 60)}m ${Math.floor(seconds % 60)}s`;
+  const formatMoney = (amount: number): string => {
+    return `$${amount.toFixed(2)}`;
+  };
+
+  const formatTime = (seconds: number): string => {
+    if (seconds < 60) return `${Math.floor(seconds)}s`;
+    if (seconds < 3600)
+      return `${Math.floor(seconds / 60)}m ${Math.floor(seconds % 60)}s`;
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     return `${hours}h ${minutes}m`;
-  }
-  const resetGame = () =>{
-    if(confirm('Reset game? All progress will be lost!')){
+  };
+  const resetGame = () => {
+    if (confirm("Reset game? All progress will be lost!")) {
       localStorage.removeItem("internetSpeedGame");
       setMoney(0);
       setClickValue(1);
@@ -320,30 +325,25 @@ export default function Loading() {
       setActiveEvent(null);
       setEventTimeLeft(0);
     }
-  }
+  };
+
+  const progressPrcent = Math.min((totalBytes / TARGET_BYTES) * 100, 100);
+  const effectiveSpeed = activeEvent
+    ? bytesPerSecond * activeEvent.speedMultiplier
+    : bytesPerSecond;
+
+  const timeRemaining = (TARGET_BYTES - totalBytes) / effectiveSpeed;
 
   return (
-    <div
-    className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-black text-white p-6"
-    >
-      <div
-      className="max-w-7xl mx-auto pt-5"
-      >
-        <div
-        className="mb-10 mt-4"
-        >
-          <h1
-          className="text-4xl font-bold text-white mb-2"
-          >
-            Loading
-          </h1>
-          <p
-          className="text-gray-400 text-lg"
-          >
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-black text-white p-6">
+      <div className="max-w-7xl mx-auto pt-5">
+        <div className="mb-10 mt-4">
+          <h1 className="text-4xl font-bold text-white mb-2">Loading</h1>
+          <p className="text-gray-400 text-lg">
             Download 100 GB as fast as you can
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }
