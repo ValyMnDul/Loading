@@ -1,6 +1,8 @@
+//loadingbar game
 "use client";
 import { useEffect, useState, useMemo, useRef, startTransition } from "react";
 
+//interfaces
 interface Upgrade {
   id: string;
   name: string;
@@ -119,6 +121,7 @@ const loadSavedData = () => {
 
 const TARGET_BYTES = 100 * 1024 * 1024 * 1024;
 
+//main component
 export default function Loading() {
   const lastClickTime = useRef(0);
 
@@ -175,6 +178,7 @@ export default function Loading() {
     []
   );
 
+  //useEffects
   useEffect(() => {
     if (hasLoadedData.current) return;
     hasLoadedData.current = true;
@@ -240,6 +244,7 @@ export default function Loading() {
       return;
     }
 
+    //functions
     const timer = setTimeout(() => {
       setEventTimeLeft((prev: number) => {
         const newTime = prev - 1;
@@ -253,6 +258,7 @@ export default function Loading() {
     return () => clearTimeout(timer);
   }, [eventTimeLeft, activeEvent]);
 
+  //click money buton
   const handleClick = () => {
     const now = Date.now();
     if (now - lastClickTime.current < CLICK_COOLDOWN) {
@@ -263,6 +269,7 @@ export default function Loading() {
     setMoney((prev: number) => prev + clickValue);
   };
 
+  //buy an upgrade button
   const buyUpgrade = (upgrade: Upgrade) => {
     if (money >= upgrade.cost) {
       setMoney((prev: number) => prev - upgrade.cost);
@@ -284,6 +291,8 @@ export default function Loading() {
       );
     }
   };
+
+  //formats
 
   const formatBytes = (bytes: number): string => {
     if (bytes < 1024) return `${bytes.toFixed(0)} B`;
@@ -313,6 +322,8 @@ export default function Loading() {
     const minutes = Math.floor((seconds % 3600) / 60);
     return `${hours}h ${minutes}m`;
   };
+
+  //RESEt game button
   const resetGame = () => {
     if (confirm("Reset game? All progress will be lost!")) {
       localStorage.removeItem("internetSpeedGame");
@@ -327,6 +338,7 @@ export default function Loading() {
     }
   };
 
+  //loading bar procentage
   const progressPrcent = Math.min((totalBytes / TARGET_BYTES) * 100, 100);
   const effectiveSpeed = activeEvent
     ? bytesPerSecond * activeEvent.speedMultiplier
@@ -334,6 +346,7 @@ export default function Loading() {
 
   const timeRemaining = (TARGET_BYTES - totalBytes) / effectiveSpeed;
 
+  //the HTML part
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-black text-white p-6">
       <div className="max-w-7xl mx-auto pt-5">
@@ -342,6 +355,33 @@ export default function Loading() {
           <p className="text-gray-400 text-lg">
             Download 100 GB as fast as you can
           </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="text-sm text-gray-400 uppercase tracking-wider mb-2">
+              Balance
+            </div>
+            <div className="text-3xl font-bold text-emerald-400">
+              {formatMoney(money)}
+            </div>
+          </div>
+          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="text-sm text-gray-400 uppercase tracking-wider mb-2">
+              Download Speed
+            </div>
+            <div className="text-3xl font-bold text-cyan-400">
+              {formatSpeed(effectiveSpeed)}
+            </div>
+          </div>
+          <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+            <div className="text-sm text-gray-400 uppercase tracking-wider mb-2">
+              Click Value
+            </div>
+            <div className="text-3xl font-bold text-amber-400">
+              {formatMoney(clickValue)}
+            </div>
+          </div>
         </div>
       </div>
     </div>
