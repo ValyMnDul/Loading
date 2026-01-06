@@ -428,6 +428,60 @@ export default function Loading() {
             </div>
           </div>
         </div>
+
+        <div className="mb-8">
+            <button
+            className="w-full md:w-auto bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 px-16 py-5 rounded-lg text-xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all active:scale-[0.98] select-none border border-blue-500"
+            onClick={handleClick}
+            >
+              Earn {formatMoney(clickValue)}
+            </button>
+        </div>
+
+        <div className="bg-gray-800 rounded-lg p-8 border border-gray-700">
+            <h2 className="text-2xl font-bold mb-6 text-white">Upgrades</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {upgrades.map((upgrade)=>{
+                const canAfford = money >= upgrade.cost;
+                return (
+                  <button
+                  key={upgrade.id}
+                  onClick={()=> buyUpgrade(upgrade)}
+                  disabled = {!canAfford}
+                  className={`p-5 rounded-lg border-2 transition-all text-left ${
+                    canAfford
+                      ? "bg-gray-700 border-emerald-600 hover:bg-gray-600 hover:border-emerald-500 cursor-pointer"
+                      : "bg-gray-900 border-gray-700 opacity-40 cursor-not-allowed"
+                  }`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{upgrade.icon}</span>
+                        <span className="text-xs font-mono bg-gray-800 px-2 py-1 rounded text-gray-400">
+                          ×{upgrade.owned}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="font-bold mb-2 text-white">
+                      {upgrade.name}
+                    </div>
+                    <div className="text-sm text-gray-400 mb-4">
+                      {upgrade.description}
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm text-emerald-400 font-mono">
+                        +{formatSpeed(upgrade.speedBoost)}
+                      </div>
+                      <div className="text-amber-400 font-bold">
+                        {formatMoney(upgrade.cost)}
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+        </div>
+
       </div>
     </div>
   );
