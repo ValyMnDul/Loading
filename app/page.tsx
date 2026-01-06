@@ -383,6 +383,51 @@ export default function Loading() {
             </div>
           </div>
         </div>
+
+        {activeEvent && (
+          <div className="bg-orange-900/30 border border-orange-700 rounded-lg p-4 mb-8">
+            <div className="lex justify-between items-center">
+              <span className="text-orange-200 font-medium">
+                {activeEvent.message}
+              </span>
+              <span className="text-orange-300 text-sm font-mono">
+                {eventTimeLeft}s remaining (×{activeEvent.speedMultiplier})
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div className="bg-gray-800 rounded-lg p-8 mb-8 border border-gray-700">
+          <div className="mb-6">
+            <div className="flex justify-between items-baseline mb-3">
+              <span className="text-gray-400 text-sm uppercase tracking-wider">
+                Progress
+              </span>
+              <span className="text-2xl font-bold text-white">
+                {progressPrcent.toFixed(2)}%
+              </span>
+            </div>
+            <div className="text-gray-300 text-lg font-semibold mb-2">
+              {formatBytes(totalBytes)} / 100 GB
+            </div>
+            {progressPrcent < 100 && (
+              <div className="text-cyan-400 text-base font-medium">
+                ETA: {formatTime(timeRemaining)}
+              </div>
+            )}
+          </div>
+          <div className="relative w-full bg-gray-900 rounded-full h-10 overflow-hidden border border-gray-700">
+            <div
+              className="absolute inset-0 bg-linear-to-r from-cyan-500 to-blue-500 transition-all duration-1000"
+              style={{ width: `${progressPrcent}%` }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-sm font-semibold text-white mix-blend-difference">
+                {formatSpeed(effectiveSpeed)}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
