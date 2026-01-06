@@ -339,7 +339,7 @@ export default function Loading() {
   };
 
   //loading bar procentage
-  const progressPrcent = Math.min((totalBytes / TARGET_BYTES) * 100, 100);
+  const progressPercent = Math.min((totalBytes / TARGET_BYTES) * 100, 100);
   const effectiveSpeed = activeEvent
     ? bytesPerSecond * activeEvent.speedMultiplier
     : bytesPerSecond;
@@ -386,7 +386,7 @@ export default function Loading() {
 
         {activeEvent && (
           <div className="bg-orange-900/30 border border-orange-700 rounded-lg p-4 mb-8">
-            <div className="lex justify-between items-center">
+            <div className="flex justify-between items-center">
               <span className="text-orange-200 font-medium">
                 {activeEvent.message}
               </span>
@@ -404,13 +404,13 @@ export default function Loading() {
                 Progress
               </span>
               <span className="text-2xl font-bold text-white">
-                {progressPrcent.toFixed(2)}%
+                {progressPercent.toFixed(2)}%
               </span>
             </div>
             <div className="text-gray-300 text-lg font-semibold mb-2">
               {formatBytes(totalBytes)} / 100 GB
             </div>
-            {progressPrcent < 100 && (
+            {progressPercent < 100 && (
               <div className="text-cyan-400 text-base font-medium">
                 ETA: {formatTime(timeRemaining)}
               </div>
@@ -419,7 +419,7 @@ export default function Loading() {
           <div className="relative w-full bg-gray-900 rounded-full h-10 overflow-hidden border border-gray-700">
             <div
               className="absolute inset-0 bg-linear-to-r from-cyan-500 to-blue-500 transition-all duration-1000"
-              style={{ width: `${progressPrcent}%` }}
+              style={{ width: `${progressPercent}%` }}
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="text-sm font-semibold text-white mix-blend-difference">
@@ -430,58 +430,87 @@ export default function Loading() {
         </div>
 
         <div className="mb-8">
-            <button
+          <button
             className="w-full md:w-auto bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 px-16 py-5 rounded-lg text-xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all active:scale-[0.98] select-none border border-blue-500"
             onClick={handleClick}
-            >
-              Earn {formatMoney(clickValue)}
-            </button>
+          >
+            Earn {formatMoney(clickValue)}
+          </button>
         </div>
 
         <div className="bg-gray-800 rounded-lg p-8 border border-gray-700">
-            <h2 className="text-2xl font-bold mb-6 text-white">Upgrades</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {upgrades.map((upgrade)=>{
-                const canAfford = money >= upgrade.cost;
-                return (
-                  <button
+          <h2 className="text-2xl font-bold mb-6 text-white">Upgrades</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {upgrades.map((upgrade) => {
+              const canAfford = money >= upgrade.cost;
+              return (
+                <button
                   key={upgrade.id}
-                  onClick={()=> buyUpgrade(upgrade)}
-                  disabled = {!canAfford}
+                  onClick={() => buyUpgrade(upgrade)}
+                  disabled={!canAfford}
                   className={`p-5 rounded-lg border-2 transition-all text-left ${
                     canAfford
                       ? "bg-gray-700 border-emerald-600 hover:bg-gray-600 hover:border-emerald-500 cursor-pointer"
                       : "bg-gray-900 border-gray-700 opacity-40 cursor-not-allowed"
                   }`}
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{upgrade.icon}</span>
-                        <span className="text-xs font-mono bg-gray-800 px-2 py-1 rounded text-gray-400">
-                          ×{upgrade.owned}
-                        </span>
-                      </div>
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{upgrade.icon}</span>
+                      <span className="text-xs font-mono bg-gray-800 px-2 py-1 rounded text-gray-400">
+                        ×{upgrade.owned}
+                      </span>
                     </div>
-                    <div className="font-bold mb-2 text-white">
-                      {upgrade.name}
+                  </div>
+                  <div className="font-bold mb-2 text-white">
+                    {upgrade.name}
+                  </div>
+                  <div className="text-sm text-gray-400 mb-4">
+                    {upgrade.description}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm text-emerald-400 font-mono">
+                      +{formatSpeed(upgrade.speedBoost)}
                     </div>
-                    <div className="text-sm text-gray-400 mb-4">
-                      {upgrade.description}
+                    <div className="text-amber-400 font-bold">
+                      {formatMoney(upgrade.cost)}
                     </div>
-                    <div className="flex justify-between items-center">
-                      <div className="text-sm text-emerald-400 font-mono">
-                        +{formatSpeed(upgrade.speedBoost)}
-                      </div>
-                      <div className="text-amber-400 font-bold">
-                        {formatMoney(upgrade.cost)}
-                      </div>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
+        <div className="text-center mt-8">
+          <button
+            className="text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
+            onClick={resetGame}
+          >
+            Reset Progress
+          </button>
+        </div>
+
+        {isGameWon && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-linear-to-br from-gray-900 to-gray-800 p-10 rounded-2xl text-center max-w-md border-2 border-emerald-500 shadow-2xl">
+              <div className="text-6xl mb-6">✓</div>
+              <h2 className="text-4xl font-bold mb-4 text-white">
+                Download Complete
+              </h2>
+              <p className="text-xl mb-4 text-gray-300">
+                You successfully downloaded 100GB
+              </p>
+              <p className="text-gray-400 mb-8">You won NOTHING</p>
+              <button
+                className="bg-linear-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 px-8 py-4 rounded-lg text-lg font-semibold transition-all transform hover:scale-105"
+                onClick={resetGame}
+              >
+                Start New Download
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
