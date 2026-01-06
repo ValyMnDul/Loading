@@ -350,6 +350,7 @@ export default function Loading() {
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-black text-white p-6">
       <div className="max-w-7xl mx-auto pt-5">
+        {/*top*/}
         <div className="mb-10 mt-4">
           <h1 className="text-4xl font-bold text-white mb-2">Loading</h1>
           <p className="text-gray-400 text-lg">
@@ -357,6 +358,7 @@ export default function Loading() {
           </p>
         </div>
 
+        {/*stats*/}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
             <div className="text-sm text-gray-400 uppercase tracking-wider mb-2">
@@ -397,6 +399,7 @@ export default function Loading() {
           </div>
         )}
 
+        {/*progres*/}
         <div className="bg-gray-800 rounded-lg p-8 mb-8 border border-gray-700">
           <div className="mb-6">
             <div className="flex justify-between items-baseline mb-3">
@@ -429,6 +432,7 @@ export default function Loading() {
           </div>
         </div>
 
+        {/*click*/}
         <div className="mb-8">
           <button
             className="w-full md:w-auto bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 px-16 py-5 rounded-lg text-xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all active:scale-[0.98] select-none border border-blue-500"
@@ -438,6 +442,7 @@ export default function Loading() {
           </button>
         </div>
 
+        {/*upgrades*/}
         <div className="bg-gray-800 rounded-lg p-8 border border-gray-700">
           <h2 className="text-2xl font-bold mb-6 text-white">Upgrades</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -482,6 +487,7 @@ export default function Loading() {
           </div>
         </div>
 
+        {/*reset*/}
         <div className="text-center mt-8">
           <button
             className="text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
@@ -491,6 +497,7 @@ export default function Loading() {
           </button>
         </div>
 
+        {/*win modal*/}
         {isGameWon && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-linear-to-br from-gray-900 to-gray-800 p-10 rounded-2xl text-center max-w-md border-2 border-emerald-500 shadow-2xl">
